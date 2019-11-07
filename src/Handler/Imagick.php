@@ -11,8 +11,13 @@ namespace BaAGee\Image\Handler;
 use BaAGee\Image\Base\ImgHandlerInterface;
 use BaAGee\Image\Image;
 
-class Imagick extends ImgHandlerInterface
+class Imagick implements ImgHandlerInterface
 {
+
+    public function __construct($imageFile = '')
+    {
+
+    }
 
     public function open($imageFile)
     {
@@ -64,7 +69,7 @@ class Imagick extends ImgHandlerInterface
         // TODO: Implement water() method.
     }
 
-    public function text($text, $font, $size, $color = '#00000000', $location = Image::IMAGE_WATER_SOUTHEAST, $offset = 0, $angle = 0)
+    public function text($text, $font, $size, $color = '#000000', $location = Image::IMAGE_WATER_SOUTHEAST, $offset = 0, $angle = 0)
     {
         // TODO: Implement text() method.
     }

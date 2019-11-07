@@ -45,9 +45,10 @@ final class Image
      */
     public function __construct($handlerClass = Gd::class, $imageFile = '')
     {
-        // if (!($handlerClass instanceof ImgHandlerInterface)) {
-        //     throw new \Exception(sprintf('%s 没有实现 %s', $handlerClass, ImgHandlerInterface::class));
-        // }
+        $impls = class_implements($handlerClass);
+        if (!in_array(ImgHandlerInterface::class, $impls)) {
+            throw new \Exception(sprintf('%s 没有实现 %s', $handlerClass, ImgHandlerInterface::class));
+        }
         $this->imgHandler = new $handlerClass($imageFile);
     }
 
