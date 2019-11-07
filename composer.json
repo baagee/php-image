@@ -1,0 +1,29 @@
+{
+  "name": "baagee/php-image",
+  "description": "PHP Image library",
+  "type": "library",
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "keywords": [
+    "PHP",
+    "Image"
+  ],
+  "authors": [
+    {
+      "name": "BaAGee",
+      "email": "2274313786@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1"
+  },
+  "suggest": {
+    "ext-gd": "ext-gd",
+    "ext-imagick": "ext-imagick"
+  },
+  "autoload": {
+    "psr-4": {
+      "BaAGee\\Image\\": "src/"
+    }
+  }
+}
