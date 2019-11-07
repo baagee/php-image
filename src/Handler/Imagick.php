@@ -1,17 +1,17 @@
 <?php
 /**
  * Desc:
- * User: 01372412
+ * User: baagee
  * Date: 2019/11/7
  * Time: 下午8:47
  */
 
 namespace BaAGee\Image\Handler;
 
-use BaAGee\Image\Base\ImgHandlerAbstract;
+use BaAGee\Image\Base\ImgHandlerInterface;
 use BaAGee\Image\Image;
 
-class Imagick extends ImgHandlerAbstract
+class Imagick extends ImgHandlerInterface
 {
 
     public function open($imageFile)

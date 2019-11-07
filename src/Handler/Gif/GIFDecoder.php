@@ -1,11 +1,4 @@
 <?php
-/**
- * Desc:
- * User: 01372412
- * Date: 2019/11/7
- * Time: 下午8:50
- */
-
 /*
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::
@@ -27,15 +20,15 @@ namespace BaAGee\Image\Handler\Gif;
 
 Class GIFDecoder
 {
-    private $GIF_buffer = Array();
-    private $GIF_arrays = Array();
-    private $GIF_delays = Array();
+    private $GIF_buffer = [];
+    private $GIF_arrays = [];
+    private $GIF_delays = [];
     private $GIF_stream = "";
     private $GIF_string = "";
     private $GIF_bfseek = 0;
 
-    private $GIF_screen = Array();
-    private $GIF_global = Array();
+    private $GIF_screen = [];
+    private $GIF_global = [];
     private $GIF_sorted;
     private $GIF_colorS;
     private $GIF_colorC;
@@ -144,8 +137,7 @@ Class GIFDecoder
     */
     private function GIFReadDescriptor()
     {
-        $GIF_screen = Array();
-
+        $GIF_screen = [];
         $this->GIFGetByte(9);
         $GIF_screen = $this->GIF_buffer;
         $GIF_colorF = $this->GIF_buffer [8] & 0x80 ? 1 : 0;

@@ -1,11 +1,4 @@
 <?php
-/**
- * Desc:
- * User: 01372412
- * Date: 2019/11/7
- * Time: 下午8:50
- */
-
 /*
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::
@@ -36,58 +29,50 @@ namespace BaAGee\Image\Handler\Gif;
 Class GIFEncoder
 {
     private $GIF = "GIF89a";        /* GIF header 6 bytes	*/
-    private $VER = "GIFEncoder V2.05";    /* Encoder version		*/
-
-    private $BUF = Array();
+    private $VER = "GIFEncoder V3.00";    /* Encoder version		*/
+    private $BUF = [];
+    private $OFS = [];
+    private $SIG = 0;
     private $LOP = 0;
     private $DIS = 2;
     private $COL = -1;
     private $IMG = -1;
 
-    private $ERR = Array(
-        'ERR00' => "Does not supported function for only one image!",
-        'ERR01' => "Source is not a GIF image!",
-        'ERR02' => "Unintelligible flag ",
-        'ERR03' => "Does not make animation from animated GIF source",
-    );
-
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GIFEncoder...
+    ::	GIFEncoder (Encode the GIF)...
     ::
     */
-    public function __construct($GIF_src, $GIF_dly, $GIF_lop, $GIF_dis, $GIF_red, $GIF_grn, $GIF_blu, $GIF_mod)
+    function __construct($GIF_src, $GIF_dly, $GIF_lop, $GIF_dis, $GIF_red, $GIF_grn, $GIF_blu, $GIF_ofs, $GIF_mod)
     {
         if (!is_array($GIF_src) && !is_array($GIF_dly)) {
-            printf("%s: %s", $this->VER, $this->ERR ['ERR00']);
-            // TODO THROW Exception
-            exit    (0);
+            throw new \Exception('Does not supported function for only one image!');
         }
-        $this->LOP = ($GIF_lop > -1) ? $GIF_lop : 0;
+        if (is_array($GIF_ofs) && count($GIF_ofs) > 1) {
+            $this->SIG = 1;
+            $this->OFS = $GIF_ofs;
+        }
+        $this->LOP = $GIF_lop === false ? false : (($GIF_lop > -1) ? $GIF_lop : 0);
         $this->DIS = ($GIF_dis > -1) ? (($GIF_dis < 3) ? $GIF_dis : 3) : 2;
         $this->COL = ($GIF_red > -1 && $GIF_grn > -1 && $GIF_blu > -1) ?
             ($GIF_red | ($GIF_grn << 8) | ($GIF_blu << 16)) : -1;
-
         for ($i = 0; $i < count($GIF_src); $i++) {
             if (strToLower($GIF_mod) == "url") {
                 $this->BUF [] = fread(fopen($GIF_src [$i], "rb"), filesize($GIF_src [$i]));
             } else if (strToLower($GIF_mod) == "bin") {
                 $this->BUF [] = $GIF_src [$i];
             } else {
-                printf("%s: %s ( %s )!", $this->VER, $this->ERR ['ERR02'], $GIF_mod);
-                exit    (0);
+                throw new \Exception('Unintelligible flag');
             }
             if (substr($this->BUF [$i], 0, 6) != "GIF87a" && substr($this->BUF [$i], 0, 6) != "GIF89a") {
-                printf("%s: %d %s", $this->VER, $i, $this->ERR ['ERR01']);
-                exit    (0);
+                throw new \Exception("Source is not a GIF image!");
             }
             for ($j = (13 + 3 * (2 << (ord($this->BUF [$i]{10}) & 0x07))), $k = TRUE; $k; $j++) {
                 switch ($this->BUF [$i]{$j}) {
                     case "!":
                         if ((substr($this->BUF [$i], ($j + 3), 8)) == "NETSCAPE") {
-                            printf("%s: %s ( %s source )!", $this->VER, $this->ERR ['ERR03'], ($i + 1));
-                            exit    (0);
+                            throw new \Exception("Does not make animation from animated GIF source");
                         }
                         break;
                     case ";":
@@ -96,37 +81,39 @@ Class GIFEncoder
                 }
             }
         }
-        $this->GIFAddHeader();
+        GIFEncoder::GIFAddHeader();
         for ($i = 0; $i < count($this->BUF); $i++) {
-            $this->GIFAddFrames($i, $GIF_dly [$i]);
+            GIFEncoder::GIFAddFrames($i, $GIF_dly [$i]);
         }
-        $this->GIFAddFooter();
+        GIFEncoder::GIFAddFooter();
     }
 
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GIFAddHeader...
+    ::	GIFAddHeader.(Add Header on Frame)..
     ::
     */
-    private function GIFAddHeader()
+    function GIFAddHeader()
     {
         $cmap = 0;
         if (ord($this->BUF [0]{10}) & 0x80) {
             $cmap      = 3 * (2 << (ord($this->BUF [0]{10}) & 0x07));
             $this->GIF .= substr($this->BUF [0], 6, 7);
             $this->GIF .= substr($this->BUF [0], 13, $cmap);
-            $this->GIF .= "!\377\13NETSCAPE2.0\3\1" . $this->GIFWord($this->LOP) . "\0";
+            if ($this->LOP !== false) {
+                $this->GIF .= "!\377\13NETSCAPE2.0\3\1" . GIFEncoder::GIFWord($this->LOP) . "\0";
+            }
         }
     }
 
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GIFAddFrames...
+    ::	GIFAddFrames (Add Frame on GIF)...
     ::
     */
-    private function GIFAddFrames($i, $d)
+    function GIFAddFrames($i, $d)
     {
         $Locals_str = 13 + 3 * (2 << (ord($this->BUF [$i]{10}) & 0x07));
 
@@ -169,9 +156,20 @@ Class GIFEncoder
         }
         if (ord($this->BUF [$i]{10}) & 0x80 && $this->IMG > -1) {
             if ($Global_len == $Locals_len) {
-                if ($this->GIFBlockCompare($Global_rgb, $Locals_rgb, $Global_len)) {
+                if (GIFEncoder::GIFBlockCompare($Global_rgb, $Locals_rgb, $Global_len)) {
                     $this->GIF .= ($Locals_ext . $Locals_img . $Locals_tmp);
                 } else {
+                    /*
+                     *
+                     * XY Padding...
+                     *
+                     */
+                    if ($this->SIG == 1) {
+                        $Locals_img{1} = chr($this->OFS [$i] [0] & 0xFF);
+                        $Locals_img{2} = chr(($$this->OFS [$i] [0] & 0xFF00) >> 8);
+                        $Locals_img{3} = chr($this->OFS [$i] [1] & 0xFF);
+                        $Locals_img{4} = chr(($this->OFS [$i] [1] & 0xFF00) >> 8);
+                    }
                     $byte          = ord($Locals_img{9});
                     $byte          |= 0x80;
                     $byte          &= 0xF8;
@@ -180,6 +178,17 @@ Class GIFEncoder
                     $this->GIF     .= ($Locals_ext . $Locals_img . $Locals_rgb . $Locals_tmp);
                 }
             } else {
+                /*
+                 *
+                 * XY Padding...
+                 *
+                 */
+                if ($this->SIG == 1) {
+                    $Locals_img{1} = chr($this->OFS [$i] [0] & 0xFF);
+                    $Locals_img{2} = chr(($$this->OFS [$i] [0] & 0xFF00) >> 8);
+                    $Locals_img{3} = chr($this->OFS [$i] [1] & 0xFF);
+                    $Locals_img{4} = chr(($this->OFS [$i] [1] & 0xFF00) >> 8);
+                }
                 $byte          = ord($Locals_img{9});
                 $byte          |= 0x80;
                 $byte          &= 0xF8;
@@ -196,10 +205,10 @@ Class GIFEncoder
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GIFAddFooter...
+    ::	GIFAddFooter (Add footer in GIF)...
     ::
     */
-    private function GIFAddFooter()
+    function GIFAddFooter()
     {
         $this->GIF .= ";";
     }
@@ -210,7 +219,7 @@ Class GIFEncoder
     ::	GIFBlockCompare...
     ::
     */
-    private function GIFBlockCompare($GlobalBlock, $LocalBlock, $Len)
+    function GIFBlockCompare($GlobalBlock, $LocalBlock, $Len)
     {
         for ($i = 0; $i < $Len; $i++) {
             if (
@@ -227,10 +236,10 @@ Class GIFEncoder
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GIFWord...
+    ::	GIFWord (Create Text Word to Give)...
     ::
     */
-    private function GIFWord($int)
+    function GIFWord($int)
     {
         return (chr($int & 0xFF) . chr(($int >> 8) & 0xFF));
     }
@@ -238,10 +247,10 @@ Class GIFEncoder
     /*
     :::::::::::::::::::::::::::::::::::::::::::::::::::
     ::
-    ::	GetAnimation...
+    ::	GetAnimation.(Create Image to animation)..
     ::
     */
-    public function GetAnimation()
+    function GetAnimation()
     {
         return ($this->GIF);
     }
