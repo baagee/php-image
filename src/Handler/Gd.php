@@ -579,7 +579,7 @@ class Gd implements ImgHandlerInterface
                     $x += $posx;
                     $y += $posy;
                 } else {
-                    E('不支持的文字位置类型');
+                    throw new \Exception('不支持的文字位置类型');
                 }
         }
 
