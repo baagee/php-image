@@ -16,15 +16,15 @@ interface  ImgHandlerInterface
 
     public function open($imageFile);
 
-    public function width();
+    public function getWidth();
 
-    public function height();
+    public function getHeight();
 
-    public function type();
+    public function getType();
 
-    public function mime();
+    public function getMime();
 
-    public function size();
+    public function getSize();
 
     public function crop($w, $h, $x = 0, $y = 0, $width = null, $height = null);
 

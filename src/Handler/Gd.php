@@ -93,7 +93,7 @@ class Gd implements ImgHandlerInterface
      * @return mixed
      * @throws \Exception
      */
-    public function width()
+    public function getWidth()
     {
         if (empty($this->imgSource)) {
             throw new \Exception('没有指定图像资源');
@@ -106,7 +106,7 @@ class Gd implements ImgHandlerInterface
      * @return mixed
      * @throws \Exception
      */
-    public function height()
+    public function getHeight()
     {
         if (empty($this->imgSource)) {
             throw new \Exception('没有指定图像资源');
@@ -119,7 +119,7 @@ class Gd implements ImgHandlerInterface
      * @return mixed
      * @throws \Exception
      */
-    public function type()
+    public function getType()
     {
         if (empty($this->imgSource)) {
             throw new \Exception('没有指定图像资源');
@@ -132,7 +132,7 @@ class Gd implements ImgHandlerInterface
      * @return mixed
      * @throws \Exception
      */
-    public function mime()
+    public function getMime()
     {
         if (empty($this->imgSource)) {
             throw new \Exception('没有指定图像资源');
@@ -145,7 +145,7 @@ class Gd implements ImgHandlerInterface
      * @return array
      * @throws \Exception
      */
-    public function size()
+    public function getSize()
     {
         if (empty($this->imgSource)) {
             throw new \Exception('没有指定图像资源');

@@ -81,45 +81,45 @@ final class Image
      * 返回图片宽度
      * @return integer 图片宽度
      */
-    public function width()
+    public function getWidth()
     {
-        return $this->imgHandler->width();
+        return $this->imgHandler->getWidth();
     }
 
     /**
      * 返回图片高度
      * @return integer 图片高度
      */
-    public function height()
+    public function getHeight()
     {
-        return $this->imgHandler->height();
+        return $this->imgHandler->getHeight();
     }
 
     /**
      * 返回图像类型
      * @return string 图片类型
      */
-    public function type()
+    public function getType()
     {
-        return $this->imgHandler->type();
+        return $this->imgHandler->getType();
     }
 
     /**
      * 返回图像MIME类型
      * @return string 图像MIME类型
      */
-    public function mime()
+    public function getMime()
     {
-        return $this->imgHandler->mime();
+        return $this->imgHandler->getMime();
     }
 
     /**
      * 返回图像尺寸数组 0 - 图片宽度，1 - 图片高度
      * @return array 图片尺寸
      */
-    public function size()
+    public function getSize()
     {
-        return $this->imgHandler->size();
+        return $this->imgHandler->getSize();
     }
 
     /**
