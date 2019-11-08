@@ -21,6 +21,10 @@ final class Image
     const IMAGE_THUMB_SOUTHEAST = 5000; //常量，标识缩略图右下角裁剪类型
     const IMAGE_THUMB_FIXED     = 6000; //常量，标识缩略图固定尺寸缩放类型
 
+    // 图片翻转
+    const IMAGE_FLIP_MODE_X = 100;// x轴翻转
+    const IMAGE_FLIP_MODE_Y = 200; // y轴翻转
+
     // 水印相关常量定义
     const IMAGE_WATER_NORTHWEST = 100000; //常量，标识左上角水印
     const IMAGE_WATER_NORTH     = 200000; //常量，标识上居中水印
@@ -178,6 +182,29 @@ final class Image
     public function text($text, $font, $size, $color = '#000000', $locate = self::IMAGE_WATER_SOUTHEAST, $offset = 0, $angle = 0)
     {
         $this->imgHandler->text($text, $font, $size, $color, $locate, $offset, $angle);
+        return $this;
+    }
+
+    /**
+     * 图片翻转
+     * @param int $mode 默认水平翻转
+     * @return $this
+     */
+    public function flip($mode = Image::IMAGE_FLIP_MODE_Y)
+    {
+        $this->imgHandler->flip($mode);
+        return $this;
+    }
+
+    /**
+     * 图片旋转
+     * @param int   $degrees 旋转角度
+     * @param array $rgb     背景填充颜色
+     * @return $this
+     */
+    public function rotate($degrees, $rgb = ['r' => 0, 'g' => 0, 'b' => 0])
+    {
+        $this->imgHandler->rotate($degrees, $rgb);
         return $this;
     }
 }

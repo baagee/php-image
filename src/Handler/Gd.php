@@ -372,6 +372,19 @@ class Gd implements ImgHandlerInterface
     }
 
     /**
+     * 返回Imagick对象
+     * @return resource
+     * @throws \Exception
+     */
+    public function getImgSource()
+    {
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被添加水印的图像资源');
+        }
+        return $this->imgSource;
+    }
+
+    /**
      * 设置图片水印
      * @param string $waterFile 图片水印文件
      * @param int    $location  水印位置
@@ -617,5 +630,66 @@ class Gd implements ImgHandlerInterface
     public function __destruct()
     {
         empty($this->imgSource) || imagedestroy($this->imgSource);
+    }
+
+    /**
+     * 旋转
+     * @param int   $degrees 旋转角度
+     * @param array $rgb     空白处颜色
+     * @return $this
+     * @throws \Exception
+     */
+    public function rotate($degrees, $rgb = ['r' => 0, 'g' => 0, 'b' => 0])
+    {
+        //资源检测
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被写入文字的图像资源');
+        }
+        do {
+            $newImg = imagerotate($this->imgSource, $degrees,
+                imageColorAllocateAlpha($this->imgSource, $rgb['r'], $rgb['g'], $rgb['b'], 127));
+            if ($this->imgInfo['type'] == 'png' && array_sum($rgb) == 0) {
+                imagealphablending($newImg, false);
+                imagesavealpha($newImg, true);
+            } else {
+                imagealphablending($newImg, true);
+                imagesavealpha($newImg, false);
+            }
+            imagedestroy($this->imgSource); //销毁原图
+            $this->imgInfo['width']  = imagesx($newImg);
+            $this->imgInfo['height'] = imagesy($newImg);
+            $this->imgSource         = $newImg;
+        } while (!empty($this->gifSource) && $this->gifNext());
+        return $this;
+    }
+
+    /**
+     * 图片翻转
+     * @param int $mode 翻转模式 水平/垂直
+     * @return $this
+     * @throws \Exception
+     */
+    public function flip($mode = Image::IMAGE_FLIP_MODE_Y)
+    {
+        //资源检测
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被写入文字的图像资源');
+        }
+
+        do {
+            $newImg = imagecreatetruecolor($this->imgInfo['width'], $this->imgInfo['height']);//翻转之后的图片
+            if ($mode == Image::IMAGE_FLIP_MODE_Y) {
+                for ($i = 0; $i < $this->imgInfo['width']; $i++) {
+                    imagecopy($newImg, $this->imgSource, $this->imgInfo['width'] - $i - 1, 0, $i, 0, 1, $this->imgInfo['height']);
+                }
+            } else if ($mode == Image::IMAGE_FLIP_MODE_X) {
+                for ($i = 0; $i < $this->imgInfo['height']; $i++) {
+                    imagecopy($newImg, $this->imgSource, 0, $this->imgInfo['height'] - $i - 1, 0, $i, $this->imgInfo['width'], 1);
+                }
+            }
+            imagedestroy($this->imgSource); //销毁原图
+            $this->imgSource = $newImg;
+        } while (!empty($this->gifSource) && $this->gifNext());
+        return $this;
     }
 }

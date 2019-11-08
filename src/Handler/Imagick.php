@@ -615,6 +615,19 @@ class Imagick implements ImgHandlerInterface
         return $this;
     }
 
+    /**
+     * 返回Imagick对象
+     * @return \Imagick
+     * @throws \Exception
+     */
+    public function getImgSource()
+    {
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被添加水印的图像资源');
+        }
+        return $this->imgSource;
+    }
+
     /*
      * 裁剪图片
      */
