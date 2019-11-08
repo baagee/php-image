@@ -18,7 +18,7 @@ $height = $image->getHeight();
 $type   = $image->getType();
 var_dump($mime, $size, $width, $height, $type);
 // 加文字水印并保存
-/*$image->text("WTF!!!", './font.otf', 29, '#00eea1')->save('./images/text.jpg');
+$image->text("WTF!!!", './font.otf', 29, '#00eea1')->save('./images/text.jpg');
 // 设置水印位置和旋转角度
 $image->open('./wtf.png')->text('WTF!!!', './font.otf', 40,
     '#123456', \BaAGee\Image\Image::IMAGE_WATER_SOUTH, 0, 90
@@ -44,7 +44,7 @@ $image->open('./gif.gif')->text('huaji滑稽', './font.otf', 30)->save('./images
 // gif缩略图
 $image->open('./gif.gif')->thumb(200, 200)->save('./images/huaji_thumb.gif');
 // gif图片水印
-$image->open('./gui.gif')->water('./bm.png')->save('./images/gui_water.gif');*/
+$image->open('./gui.gif')->water('./bm.png')->save('./images/gui_water.gif');
 
 // 翻转
 $image->open('./thumb.jpg')->flip()->save('./images/thumb_flip_y.jpg');
@@ -73,7 +73,7 @@ $image->open('./wtf.png')->rotate(45)->save('./images/wtf_rotate_60.png');
 $image->open('./wtf.png')->rotate(45)
     ->crop(200, 200, 300, 300)
     ->save('./images/wtf_rotate_crop_45.png');
-
+// 旋转并裁剪
 $image->open('./wtf.png')->rotate(45, [
     'r' => 200, 'g' => 90, 'b' => 100
 ])->crop(400, 400, 10, 0, 200, 200)

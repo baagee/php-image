@@ -35,4 +35,8 @@ interface  ImgHandlerInterface
     public function water($source, $location = Image::IMAGE_WATER_SOUTHEAST, $alpha = 80);
 
     public function text($text, $font, $size, $color = '#00000000', $location = Image::IMAGE_WATER_SOUTHEAST, $offset = 0, $angle = 0);
+
+    public function rotate($degrees, $backgroundColor = ['r' => 0, 'g' => 0, 'b' => 0]);
+
+    public function flip($mode = Image::IMAGE_FLIP_MODE_Y);
 }

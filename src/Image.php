@@ -199,12 +199,12 @@ final class Image
     /**
      * 图片旋转
      * @param int   $degrees 旋转角度
-     * @param array $rgb     背景填充颜色
+     * @param array $rgba    背景填充颜色
      * @return $this
      */
-    public function rotate($degrees, $rgb = ['r' => 0, 'g' => 0, 'b' => 0])
+    public function rotate($degrees, $rgba = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 1.0])
     {
-        $this->imgHandler->rotate($degrees, $rgb);
+        $this->imgHandler->rotate($degrees, $rgba);
         return $this;
     }
 }

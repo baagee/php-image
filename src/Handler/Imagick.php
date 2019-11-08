@@ -168,7 +168,7 @@ class Imagick implements ImgHandlerInterface
 
             //压缩图片
             $this->imgSource = $img->deconstructImages();
-            $img->destroy(); //销毁零时图片
+            $img->destroy(); //销毁临时图片
         } else {
             $this->_crop($w, $h, $x, $y, $width, $height);
         }
@@ -323,15 +323,15 @@ class Imagick implements ImgHandlerInterface
                         $img->setImageDelay($imgs->getImageDelay());
                         $img->setImagePage($width, $height, 0, 0);
 
-                        $image->destroy(); //销毁零时图片
+                        $image->destroy(); //销毁临时图片
 
                     } while ($imgs->nextImage());
 
                     //压缩图片
                     $this->imgSource->destroy();
                     $this->imgSource = $img->deconstructImages();
-                    $imgs->destroy(); //销毁零时图片
-                    $img->destroy(); //销毁零时图片
+                    $imgs->destroy(); //销毁临时图片
+                    $img->destroy(); //销毁临时图片
                 } else {
                     //填充图像
                     $img = $this->_fill($newimg, $posx, $posy, $neww, $newh);
@@ -460,7 +460,7 @@ class Imagick implements ImgHandlerInterface
 
             //压缩图片
             $this->imgSource = $img->deconstructImages();
-            $img->destroy(); //销毁零时图片
+            $img->destroy(); //销毁临时图片
 
         } else {
             //添加水印
@@ -607,7 +607,7 @@ class Imagick implements ImgHandlerInterface
 
             //压缩图片
             $this->imgSource = $img->deconstructImages();
-            $img->destroy(); //销毁零时图片
+            $img->destroy(); //销毁临时图片
         } else {
             $this->imgSource->annotateImage($draw, $x + $ox, $y + $oy, $angle, $text);
         }
@@ -674,5 +674,80 @@ class Imagick implements ImgHandlerInterface
     public function __destruct()
     {
         empty($this->imgSource) || $this->imgSource->destroy();
+    }
+
+    /**
+     * 旋转图片
+     * @param int   $degrees         旋转角度
+     * @param array $backgroundColor 周围背景颜色
+     * @return $this
+     * @throws \Exception
+     */
+    public function rotate($degrees, $backgroundColor = ['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0])
+    {
+        //资源检测
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被写入文字的图像资源');
+        }
+
+        $backgroundColor = new \ImagickPixel(sprintf(
+            "rgba(%d,%d,%d,%s)",
+            $backgroundColor['r'] ?? 0,
+            $backgroundColor['g'] ?? 0,
+            $backgroundColor['b'] ?? 0,
+            $backgroundColor['a'] ?? 0
+        ));
+        if ('gif' == $this->imgInfo['type']) {
+            $img = $this->imgSource->coalesceImages();
+            $this->imgSource->destroy(); //销毁原图
+
+            do {
+                $img->rotateimage($backgroundColor, $degrees);//旋转指定角度
+            } while ($img->nextImage());
+
+            //压缩图片
+            $this->imgSource = $img->coalesceImages();
+            $img->destroy(); //销毁临时图片
+        } else {
+            $this->imgSource->rotateimage($backgroundColor, $degrees);//旋转指定角度
+        }
+        $this->imgInfo['width']  = $this->imgSource->getImageWidth();
+        $this->imgInfo['height'] = $this->imgSource->getImageHeight();
+        return $this;
+    }
+
+    /**
+     * 翻转图片
+     * @param int $mode 翻转模式 x轴翻转 y轴翻转
+     * @return $this
+     * @throws \Exception
+     */
+    public function flip($mode = Image::IMAGE_FLIP_MODE_Y)
+    {
+        //资源检测
+        if (empty($this->imgSource)) {
+            throw new \Exception('没有可以被写入文字的图像资源');
+        }
+        if ('gif' == $this->imgInfo['type']) {
+            $img = $this->imgSource->coalesceImages();
+            $this->imgSource->destroy(); //销毁原图
+            do {
+                if ($mode == Image::IMAGE_FLIP_MODE_X) {
+                    $img->flipImage();
+                } else {
+                    $img->flopImage();
+                }
+            } while ($img->nextImage());
+            //压缩图片
+            $this->imgSource = $img->deconstructImages();
+            $img->destroy(); //销毁临时图片
+        } else {
+            if ($mode == Image::IMAGE_FLIP_MODE_X) {
+                $this->imgSource->flipImage();
+            } else {
+                $this->imgSource->flopImage();
+            }
+        }
+        return $this;
     }
 }
